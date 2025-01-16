@@ -1,4 +1,4 @@
-package testcommand
+package testCommand
 
 import (
 	"github.com/bwmarrin/discordgo"

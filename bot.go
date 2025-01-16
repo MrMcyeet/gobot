@@ -9,13 +9,13 @@ import (
 	"github.com/bwmarrin/discordgo"
 
 	"github.com/mrmcyeet/gobot/modules/config"
-	testcommand "github.com/mrmcyeet/gobot/modules/test"
-	types "github.com/mrmcyeet/gobot/modules/utils"
+	"github.com/mrmcyeet/gobot/modules/testCommand"
+	"github.com/mrmcyeet/gobot/modules/utils"
 )
 
 var (
-	Client   *types.Bot
-	Commands map[string]types.Command
+	Client   *utils.Bot
+	Commands map[string]utils.Command
 )
 
 func main() {
@@ -37,9 +37,8 @@ func main() {
 
 	// Register commands
 	client.AddHandlerOnce(func(session *discordgo.Session, message *discordgo.Ready) {
-
-		Commands = make(map[string]types.Command)
-		Commands["ping"] = *testcommand.NewPingCommand()
+		Commands = make(map[string]utils.Command)
+		Commands["ping"] = *testCommand.NewPingCommand()
 
 		for _, command := range Commands {
 			_, err := session.ApplicationCommandCreate(session.State.User.ID, "1001017041039409233", &discordgo.ApplicationCommand{
@@ -68,8 +67,7 @@ func main() {
 		}
 	})
 
-	err = client.Open()
-	if err != nil {
+	if err = client.Open(); err != nil {
 		log.Fatalf("error opening connection: %v", err)
 		return
 	}
@@ -77,7 +75,7 @@ func main() {
 	defer client.Close()
 	fmt.Println("Bot is now running. Press CTRL+C to exit.")
 
-	Client = &types.Bot{
+	Client = &utils.Bot{
 		Session: client,
 		Config:  config,
 	}

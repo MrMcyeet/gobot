@@ -8,9 +8,9 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	types "github.com/mrmcyeet/gobot/modules/_internal"
 	"github.com/mrmcyeet/gobot/modules/config"
 	testcommand "github.com/mrmcyeet/gobot/modules/test"
+	types "github.com/mrmcyeet/gobot/modules/utils"
 )
 
 var (
@@ -36,7 +36,7 @@ func main() {
 	})
 
 	// Register commands
-	client.AddHandler(func(session *discordgo.Session, message *discordgo.Ready) {
+	client.AddHandlerOnce(func(session *discordgo.Session, message *discordgo.Ready) {
 
 		Commands = make(map[string]types.Command)
 		Commands["ping"] = *testcommand.NewPingCommand()

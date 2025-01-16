@@ -2,23 +2,19 @@ package testcommand
 
 import (
 	"github.com/bwmarrin/discordgo"
-	types "github.com/mrmcyeet/gobot/modules/_internal"
+	"github.com/mrmcyeet/gobot/modules/utils"
 )
 
-func NewPingCommand() *types.Command {
-	return &types.Command{
-		ApplicationCommand: &discordgo.ApplicationCommand{
-			Name:        "ping",
-			Description: "Responds with pong! Used to check if the bot is alive",
+func NewPingCommand() *utils.Command {
+
+	return utils.NewCommand(
+		"ping",
+		"Responds with pong! Used to check if the bot is alive",
+		func(bot *utils.Bot, interaction *discordgo.InteractionCreate) error {
+			return bot.Session.InteractionRespond(interaction.Interaction,
+				utils.NewEphemeralResponse("Pong! 🏓"),
+			)
 		},
-		Execute: func(bot *types.Bot, interaction *discordgo.InteractionCreate) error {
-			return bot.Session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Flags:   discordgo.MessageFlagsEphemeral,
-					Content: "Pong! 🏓",
-				},
-			})
-		},
-	}
+	)
+
 }

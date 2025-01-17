@@ -7,7 +7,7 @@ import (
 
 func NewPingCommand() *utils.Command {
 
-	return utils.NewCommand(
+	return utils.NewUserCommand(
 		"ping",
 		"Responds with pong! Used to check if the bot is alive",
 		func(bot *utils.Bot, interaction *discordgo.InteractionCreate) error {

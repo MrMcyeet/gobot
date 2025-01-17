@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -40,23 +41,31 @@ func main() {
 		Commands = make(map[string]utils.Command)
 		Commands["ping"] = *testCommand.NewPingCommand()
 
+		commandList := make([]*discordgo.ApplicationCommand, 0, len(Commands))
 		for _, command := range Commands {
-			_, err := session.ApplicationCommandCreate(session.State.User.ID, "1001017041039409233", &discordgo.ApplicationCommand{
-				Name:        command.Name,
-				Description: command.Description,
-			})
+			commandList = append(commandList, command.ApplicationCommand)
+			fmt.Printf("Attempting to register /%v\n", command.Name)
+		}
 
-			fmt.Printf("Command %s registered\n", command.Name)
-
-			if err != nil {
-				fmt.Println(fmt.Errorf("failed to create command %s: %w", command.Name, err))
-			}
+		if _, err := session.ApplicationCommandBulkOverwrite(session.State.User.ID, "", commandList); err != nil {
+			fmt.Println(fmt.Errorf("failed to update commands: %w", err))
 		}
 	})
 
-	// Setup command handlers
+	// Setup commands handler
 	client.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
-		fmt.Printf("Command get: %s", interaction.ApplicationCommandData().Name)
+		//dang, this would've been clever, I think
+		//username := map[bool]string{true: interaction.Member.User.Username, false: interaction.User.Username}[interaction.Member.User.Username != ""]
+
+		var username string
+		if interaction.Member != nil {
+			username = interaction.Member.User.Username
+		} else {
+			username = interaction.User.Username
+		}
+
+		fmt.Printf("@%s executed /%s\n", username, interaction.ApplicationCommandData().Name)
+
 		command, ok := Commands[interaction.ApplicationCommandData().Name]
 		if !ok {
 			return
@@ -73,7 +82,7 @@ func main() {
 	}
 
 	defer client.Close()
-	fmt.Println("Bot is now running. Press CTRL+C to exit.")
+	fmt.Printf("@%s is now running. Press CTRL+C to exit.\n", client.State.User.Username)
 
 	Client = &utils.Bot{
 		Session: client,
@@ -81,6 +90,6 @@ func main() {
 	}
 
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt /*syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill*/)
+	signal.Notify(sc, os.Interrupt, syscall.SIGINT, syscall.SIGTERM /*, os.Kill*/)
 	<-sc
 }

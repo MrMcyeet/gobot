@@ -72,7 +72,7 @@ func main() {
 		}
 
 		if err := command.Execute(Client, interaction); err != nil {
-			fmt.Println(fmt.Errorf("failed to execute command /%s, invoked by @%s: %w", command.Name, interaction.User.GlobalName, err))
+			fmt.Println(fmt.Errorf("failed to execute command /%s, invoked by @%s: %w", command.Name, username, err))
 		}
 	})
 
